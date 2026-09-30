@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Sécurité Butane - QHSE GPL SA</title>
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --success-color: #198754;
+            --warning-color: #fd7e14;
+            --bg-color: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 650px;
+            width: 100%;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .question-card {
+            background: #f1f3f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .question-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .options label {
+            display: block;
+            font-weight: normal;
+            margin-bottom: 6px;
+            cursor: pointer;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #0b5ed7;
+        }
+
+        #timer {
+            text-align: right;
+            font-weight: bold;
+            color: #d63384;
+            margin-bottom: 15px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .result-box {
+            text-align: center;
+        }
+
+        .score-display {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 15px 0;
+        }
+
+        .appreciation-msg {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background: #e9ecef;
+        }
+
+        .contact-box {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #dee2e6;
+            font-size: 0.9rem;
+            color: #495057;
+            line-height: 1.5;
+        }
+
+        .contact-box strong {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>GPL SA - Grand Quiz Sécurité Butane QHSE</h1>
+    <div class="subtitle">Testez vos connaissances approfondies et validez vos réflexes professionnels</div>
+
+    <!-- ÉTAPE 1 : IDENTIFICATION -->
+    <div id="step-identification" class="form-group">
+        <label for="username">Entrez votre Nom et Prénom :</label>
+        <input type="text" id="username" placeholder="Ex: Jean Dupont" required>
+        <br><br>
+        <button onclick="startQuiz()">Commencer le Quiz</button>
+    </div>
+
+    <!-- ÉTAPE 2 : LE QUIZ -->
+    <div id="step-quiz" class="hidden">
+        <div id="timer">Temps : <span id="time">0</span> secondes</div>
+
+        <div id="questions-container">
+            <!-- Les 20 questions seront injectées ici par JavaScript -->
+        </div>
+
+        <button onclick="submitQuiz()">Valider mes réponses</button>
+    </div>
+
+    <!-- ÉTAPE 3 : RÉSULTAT -->
+    <div id="step-result" class="hidden result-box">
+        <h2>Résultat du Quiz</h2>
+        <p>Participant : <strong id="res-name"></strong></p>
+        <div class="score-display">Score : <span id="res-score"></span> / 20</div>
+        <p>Temps total : <strong><span id="res-time"></span> secondes</strong></p>
+
+        <div id="appreciation" class="appreciation-msg"></div>
+
+        <div class="contact-box">
+            En cas de besoin, rapprochez-vous du service QHSE GPL SA ou appelez au <strong>06 643 20 81</strong>.
+        </div>
+    </div>
+</div>
+
+<script>
+    const questionsData = [
+        {
+            title: "1. Quelle est la principale caractéristique physique du gaz butane par rapport à l'air ?",
+            options: [
+                { text: "A) Il est plus léger que l'air et s'élève", correct: false },
+                { text: "B) Il est plus lourd que l'air et stagne au sol", correct: true },
+                { text: "C) Il a exactement la même densité que l'air", correct: false }
+            ]
+        },
+        {
+            title: "2. Que devez-vous faire en premier en cas de forte odeur suspecte de gaz sur le site ?",
+            options: [
+                { text: "A) Allumer un briquet pour trouver la fuite", correct: false },
+                { text: "B) Isoler la zone, couper les sources d'ignition et alerter", correct: true },
+                { text: "C) Attendre la fin de la journée pour le signaler", correct: false }
+            ]
+        },
+        {
+            title: "3. Comment doit-on stocker une bouteille de butane pleine en extérieur ou en atelier ?",
+            options: [
+                { text: "A) Couchée horizontalement pour éviter qu'elle ne tombe", correct: false },
+                { text: "B) Debout, arrimée et à l'abri des sources de chaleur", correct: true },
+                { text: "C) N'importe où du moment qu'elle est à l'ombre", correct: false }
+            ]
+        },
+        {
+            title: "4. Quel est l'équipement de protection individuel (EPI) indispensable lors de la manipulation de raccords de gaz liquéfié sous pression ?",
+                options: [
+                { text: "A) Des lunettes de protection et des gants adaptés", correct: true },
+                { text: "B) Un simple t-shirt en coton", correct: false },
+                { text: "C) Des chaussures de ville sans coque", correct: false }
+            ]
+        },
+        {
+            title: "5. Pourquoi ajoute-t-on un odorisant (éthanethiol) au gaz butane inodore à l'origine ?",
+                options: [
+                { text: "A) Pour améliorer son pouvoir calorifique", correct: false },
+                { text: "B) Pour détecter rapidement les fuites olfactives", correct: true },
+                { text: "C) Pour le colorer en jaune", correct: false }
+            ]
+        },
+        {
+            title: "6. Quelle est la conduite à tenir face à un flexible de raccordement périmé ou endommagé ?",
+                options: [
+                { text: "A) Le réparer avec du ruban adhésif isolant", correct: false },
+                { text: "B) Le remplacer immédiatement par un modèle certifié et conforme", correct: true },
+                { text: "C) Continuer à l'utiliser jusqu'à la prochaine maintenance", correct: false }
+            ]
+        },
+        {
+            title: "7. Quel type d'extincteur est généralement proscrit ou manipulé avec précaution extrême sur un feu de gaz sous pression avant d'avoir coupé la vanne ?",
+                options: [
+                { text: "A) L'extincteur à poudre", correct: false },
+                { text: "B) L'extincteur à eau (risque d'aggravation ou de choc thermique)", correct: true },
+                { text: "C) L'extincteur à CO2", correct: false }
+            ]
+        },
+        {
+            title: "8. Que signifie l'acronyme QHSE dans l'environnement de travail de GPL SA ?",
+                options: [
+                { text: "A) Qualité, Hygiène, Sécurité, Environnement", correct: true },
+                { text: "B) Quartier, Habitat, Sécurité, Énergie", correct: false },
+                { text: "C) Qualification, Homologation, Service, Exploitation", correct: false }
+            ]
+        },
+        {
+            title: "9. Est-il autorisé de fumer ou d'utiliser une flamme nue à proximité des zones de stockage de bouteilles de butane ?",
+                options: [
+                { text: "A) Oui, uniquement pendant les heures de pause", correct: false },
+                { text: "B) Non, interdiction absolue en raison du risque d'explosion", correct: true },
+                { text: "C) Oui, si on se tient à plus de deux mètres", correct: false }
+            ]
+        },
+        {
+            title: "10. Comment vérifier de manière sécurisée l'étanchéité d'un raccord de gaz après un changement de bouteille ?",
+                options: [
+                { text: "A) En approchant une allumette enflammée", correct: false },
+                { text: "B) En utilisant de l'eau savonneuse (formation de bulles en cas de fuite)", correct: true },
+                { text: "C) En écoutant simplement de loin sans vérifier", correct: false }
+            ]
+        },
+        {
+            title: "11. Quel comportement adopter en cas de départ de feu sur une installation de GPL ?",
+                options: [
+                { text: "A) Fuir en courant sans alerter personne", correct: false },
+                { text: "B) Couper l'alimentation en gaz si c'est accessible et sans danger, déclencher l'alarme et intervenir si formé", correct: true },
+                { text: "C) Jeter de l'eau directement sur la flamme", correct: false }
+            ]
+        },
+        {
+            title: "12. Quelle est l'action principale d'une soupape de sécurité sur un réservoir ou une bouteille de GPL ?",
+                options: [
+                { text: "A) Remplir plus vite le réservoir", correct: false },
+                { text: "B) Libérer automatiquement la pression excessive en cas de surpression critique", correct: true },
+                { text: "C) Bloquer l'ouverture du robinet", correct: false }
+            ]
+        },
+        {
+            title: "13. Pourquoi est-il strictement interdit de coucher une bouteille de butane en cours d'utilisation ?",
+                options: [
+                { text: "A) Cela risque d'entraîner la sortie de gaz à l'état liquide dans la tuyauterie", correct: true },
+                { text: "B) Cela use la peinture de la bouteille", correct: false },
+                { text: "C) Cela n'a aucune importance technique", correct: false }
+            ]
+        },
+        {
+            title: "14. Qu'appelle-t-on un « presqu'accident » (ou situation dangereuse) en milieu industriel ?",
+                options: [
+                { text: "A) Un accident grave qui a nécessité l'hôpital", correct: false },
+                { text: "B) Un événement non souhaité qui aurait pu causer un dommage mais qui a été évité de justesse", correct: true },
+                { text: "C) Une panne de machine sans gravité", correct: false }
+            ]
+        },
+        {
+            title: "15. Quel est le numéro d'urgence interne du service QHSE GPL SA à contacter en cas de besoin ?",
+                options: [
+                { text: "A) 06 643 20 81", correct: true },
+                { text: "B) 05 555 12 34", correct: false },
+                { text: "C) 01 111 99 88", correct: false }
+            ]
+        },
+        {
+            title: "16. Quel effet le GPL (liquide) peut-il provoquer s'il entre en contact direct avec la peau nue ?",
+                options: [
+                { text: "A) Une brûlure thermique par la chaleur", correct: false },
+                { text: "B) Des gelures graves par évaporation ultra-rapide", correct: true },
+                { text: "C) Une simple irritation passagère sans danger", correct: false }
+            ]
+        },
+        {
+            title: "17. Que doit comporter obligatoirement toute zone de stockage de gaz butane sur le site ?",
+                options: [
+                { text: "A) Des panneaux de signalisation de danger explicites (Feu nu interdit, Gaz inflammable)", correct: true },
+                { text: "B) Un distributeur de boissons fraîches", correct: false },
+                { text: "C) Des plantes vertes décoratives", correct: false }
+            ]
+        },
+        {
+            title: "18. Quelle est la bonne pratique avant d'intervenir techniquement sur un équipement contenant du GPL ?",
+                options: [
+                { text: "A) Dégazer, consigner l'installation et porter les EPI requis", correct: true },
+                { text: "B) Travailler rapidement sans rien couper", correct: false },
+                { text: "C) Demander l'avis d'un collègue par message", correct: false }
+            ]
+        },
+        {
+            title: "19. Pourquoi les locaux de stockage de bouteilles de GPL doivent-ils être correctement ventilés (en partie haute et basse) ?",
+                options: [
+                { text: "A) Pour évacuer toute accumulation potentielle de gaz lourd au sol", correct: true },
+                { text: "B) Pour rafraîchir les employés en été", correct: false },
+                { text: "C) Pour empêcher les moustiques d'entrer", correct: false }
+            ]
+        },
+        {
+            title: "20. Quelle est la responsabilité de chaque employé en matière de QHSE sur le site ?",
+                options: [
+                { text: "A) La sécurité concerne uniquement le responsable QHSE", correct: false },
+                { text: "B) Chacun est acteur de sa propre sécurité et de celle de ses collègues", correct: true },
+                { text: "C) Il faut uniquement appliquer les règles quand le directeur regarde", correct: false }
+            ]
+        }
+    ];
+
+    let startTime;
+    let timerInterval;
+    let secondsElapsed = 0;
+
+    function startQuiz() {
+        const username = document.getElementById('username').value.trim();
+        if (username === "") {
+            alert("Veuillez entrer votre nom et prénom avant de commencer.");
+            return;
+        }
+
+        // Générer dynamiquement les questions dans le HTML
+        const container = document.getElementById('questions-container');
+        container.innerHTML = "";
+
+        questionsData.forEach((q, index) => {
+            let optionsHtml = '';
+            q.options.forEach((opt, optIndex) => {
+                optionsHtml += `<label><input type="radio" name="q${index}" value="${opt.correct}"> ${opt.text}</label>`;
+            });
+
+            container.innerHTML += `
+                <div class="question-card">
+                    <div class="question-title">${q.title}</div>
+                    <div class="options">
+                        ${optionsHtml}
+                    </div>
+                </div>
+            `;
+        });
+
+        document.getElementById('step-identification').classList.add('hidden');
+        document.getElementById('step-quiz').classList.remove('hidden');
+
+        // Démarrer le chronomètre
+        startTime = new Date();
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            document.getElementById('time').innerText = secondsElapsed;
+        }, 1000);
+    }
+
+    function submitQuiz() {
+        // Vérifier si toutes les questions ont reçu une réponse
+        for (let i = 0; i < questionsData.length; i++) {
+            const answered = document.querySelector(`input[name="q${i}"]:checked`);
+            if (!answered) {
+                alert(`Veuillez répondre à la question ${i + 1} avant de valider.`);
+                return;
+            }
+        }
+
+        // Arrêter le chronomètre
+        clearInterval(timerInterval);
+
+        // Correction automatique
+        let score = 0;
+        questionsData.forEach((q, index) => {
+            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+            if (selected && selected.value === "true") {
+                score++;
+            }
+        });
+
+        const username = document.getElementById('username').value;
+
+        // Affichage des résultats
+        document.getElementById('step-quiz').classList.add('hidden');
+        document.getElementById('step-result').classList.remove('hidden');
+
+        document.getElementById('res-name').innerText = username;
+        document.getElementById('res-score').innerText = score;
+        document.getElementById('res-time').innerText = secondsElapsed;
+
+        // Gestion de l'appréciation selon le score (sur 20)
+        const appreciationEl = document.getElementById('appreciation');
+        if (score >= 15) {
+            appreciationEl.style.color = "var(--success-color)";
+            appreciationEl.innerText = `Bravo M. ${username}, excellent travail !`;
+        } else {
+            appreciationEl.style.color = "var(--warning-color)";
+            appreciationEl.innerText = `Vous devez faire plus d'effort M. ${username}, vous êtes sur le bon chemin.`;
+        }
+    }
+</script>
+
+</body>
+</html>
